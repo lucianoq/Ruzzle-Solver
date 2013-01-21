@@ -1,4 +1,4 @@
-public class Node {
+public class Node implements Cloneable {
 
 	public char		ch;
 	public int		i;
@@ -17,6 +17,16 @@ public class Node {
 		this.i = i;
 		this.j = j;
 		this.visited = false;
+	}
+
+	@Override
+	public Node clone() {
+		Node n = new Node();
+		n.ch = this.ch;
+		n.i = this.i;
+		n.j = this.j;
+		n.visited = false;
+		return n;
 	}
 
 }

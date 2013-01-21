@@ -1,7 +1,14 @@
 import java.io.IOException;
 
 public class MainClass {
+	
+	public static long now;
 
+	public static void when() {
+		long relNow = System.currentTimeMillis() - now;
+		System.out.println(relNow);
+	}
+	
 	public static void main(String[] args) throws IOException {
 		char[] chars = new char[16];
 
@@ -12,13 +19,13 @@ public class MainClass {
 		chars = args[0].toCharArray();
 
 		Ruzzle r = new Ruzzle(chars);
-
-		//r.printSchema();
+		
+		// r.printSchema();
 
 		r.findWords();
-
-		r.printSortedAlphabetically();
-		//r.printSortedByLength();
+		
+		//r.printSortedAlphabetically();
+		r.printSortedByLength();
 	}
 
 }

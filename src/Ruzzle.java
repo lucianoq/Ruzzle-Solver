@@ -24,17 +24,17 @@ class LengthComparator implements java.util.Comparator<String> {
 
 public class Ruzzle {
 
+	public GenerateThread[]		threads;
 	public ArrayList<Node>		nodes;
 	public Dictionary				diz;
 	public TreeSet<String>		wordsSaid;
-	public TreeSet<String>		wordsAll;
-	public ArrayList<String>	wordsFound;
+	public ArrayList<String>	wordsSortedLength;
+	public ArrayList<String>	wordsSortedAlph;
 
 	public Ruzzle(char[] list) {
 		nodes = new ArrayList<Node>(16);
 		diz = new Dictionary();
 		wordsSaid = new TreeSet<String>();
-		wordsAll = new TreeSet<String>();
 
 		int i = 0;
 		int j = 0;
@@ -52,25 +52,34 @@ public class Ruzzle {
 		}
 	}
 
-	private ArrayList<Node> neighbors(Node n) {
-		ArrayList<Node> l = new ArrayList<Node>(8);
-		for (Node nn : this.nodes) {
-			if (nn.visited == false)
-				if ((Math.abs(n.i - nn.i) < 2) && (Math.abs(n.j - nn.j) < 2)) {
-					l.add(nn);
-				}
-		}
-		return l;
-	}
-
 	private void generateAll() {
-		for (Node n : this.nodes) {
-			n.visited = true;
-			stringsFromN(n, "");
-			n.visited = false;
+		// System.out.println("\nAVVIO I THREAD");
+		// MainClass.now = System.currentTimeMillis();
+		// MainClass.when();
+
+		threads = new GenerateThread[8];
+
+		for (int i = 0; i < 8; i++) {
+			ArrayList<Node> t = new ArrayList<Node>(16);
+			for (Node n : this.nodes) {
+				t.add(n.clone());
+			}
+
+			threads[i] = new GenerateThread(t, i, i + 8);
+			threads[i].start();
 		}
 
-		this.unvisitAll();
+		for (int i = 0; i < 8; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// System.out.println("PAROLE GENERATE: " + wordsAll.size());
+
+		// MainClass.when();
 	}
 
 	public void printSchema() {
@@ -84,42 +93,35 @@ public class Ruzzle {
 	}
 
 	public void printSortedAlphabetically() {
-		for (String s : wordsSaid) {
-			System.out.println(s);
+		wordsSortedAlph = new ArrayList<String>(wordsSaid.size() + 1);
+		wordsSortedAlph.addAll(wordsSaid);
+		Collections.sort(wordsSortedAlph);
+		for (String s : wordsSortedAlph) {
+			System.out.print(s + "\t");
 		}
+		System.out.println();
 	}
 
 	public void printSortedByLength() {
-		wordsFound = new ArrayList<String>(wordsSaid.size() + 1);
-		wordsFound.addAll(wordsSaid);
-		Collections.sort(wordsFound, new LengthComparator(LengthComparator.DESC));
-		for (String s : wordsFound) {
-			System.out.println(s);
+		wordsSortedLength = new ArrayList<String>(wordsSaid.size() + 1);
+		wordsSortedLength.addAll(wordsSaid);
+		Collections.sort(wordsSortedLength, new LengthComparator(LengthComparator.DESC));
+		for (String s : wordsSortedLength) {
+			System.out.print(s + "\t");
 		}
-	}
-
-	private void stringsFromN(Node n, String s) {
-		n.visited = true;
-		String str = s + n.ch;
-		wordsAll.add(str);
-		for (Node na : neighbors(n)) {
-			stringsFromN(na, str);
-		}
-		n.visited = false;
+		System.out.println();
 	}
 
 	public void findWords() {
 		this.generateAll();
-		for (String s : wordsAll) {
-			if (!wordsSaid.contains(s))
-				if (s.length() > 1)
-					if (diz.diz.contains(s))
-						wordsSaid.add(s);
+
+		for (GenerateThread gt : threads) {
+			for (String s : gt.generated)
+				if (!wordsSaid.contains(s))
+					if (s.length() > 1)
+						if (diz.diz.contains(s))
+							wordsSaid.add(s);
 		}
 	}
 
-	private void unvisitAll() {
-		for (Node n : this.nodes)
-			n.visited = false;
-	}
 }
