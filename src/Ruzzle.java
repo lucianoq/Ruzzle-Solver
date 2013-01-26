@@ -97,7 +97,8 @@ public class Ruzzle {
 		wordsSortedAlph.addAll(wordsSaid);
 		Collections.sort(wordsSortedAlph);
 		for (String s : wordsSortedAlph) {
-			System.out.print(s + "\t");
+			//System.out.print(s + "\t");
+			System.out.println(s);
 		}
 		System.out.println();
 	}
@@ -107,7 +108,8 @@ public class Ruzzle {
 		wordsSortedLength.addAll(wordsSaid);
 		Collections.sort(wordsSortedLength, new LengthComparator(LengthComparator.DESC));
 		for (String s : wordsSortedLength) {
-			System.out.print(s + "\t");
+			//System.out.print(s + "\t");
+			System.out.println(s);
 		}
 		System.out.println();
 	}
